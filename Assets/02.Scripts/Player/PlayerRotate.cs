@@ -3,6 +3,7 @@ using UnityEngine;
 public class PlayerRotate : MonoBehaviour
 {
     public float RotationSpeed = 150f; // 카메라와 회전속도가 똑같아야 한다.
+    public GameObject CameraBoom;
 
     private float _rotationX = 0;
     private float _rotationY = 0;
@@ -26,7 +27,8 @@ public class PlayerRotate : MonoBehaviour
         _rotationY = Mathf.Clamp(_rotationY, -90f, 90f);
 
         // 3. 카메라를 회전한다.
-        transform.eulerAngles = new Vector3(-_rotationY, _rotationX, 0);
+        transform.eulerAngles = new Vector3(0, _rotationX, 0);
+        CameraBoom.transform.localEulerAngles = new Vector3(-_rotationY, 0, 0);
     }
 
     private void SetMouseSensitive()
