@@ -1,0 +1,151 @@
+using System;
+using UnityEditor.Experimental.GraphView;
+using UnityEngine;
+
+public class PlayerMove : MonoBehaviour
+{
+    // 목표 : WASD를 누르면 캐릭터를 이동시키고 싶다.
+    // 필요 속성:
+    // - 이동속도
+    public float MoveSpeed = 7f;
+    public float SprintSpeed = 12f;
+    public float DashSpeed = 3f;
+    public float ClimbSpeed = 1f;
+    public float JumpPower = 10f;
+    public int MaxMultiJump = 2;
+
+
+    public float StaminaRecovery = 5f;
+    public float SprintStamina = 10f;
+    public float DashStamina = 10f;
+    public float DashDuration = 1f;
+    public float ClimbStamina = 15f;
+    public float JumpStamina = 30f;
+
+    private CharacterController _characterController;
+
+    private const float GRAVITY = -9.8f;
+    private float _yVelocity = 0f;
+
+    private int _jumpChance;
+
+    private float _dashTimer=0f;
+    private bool _isDash = false;
+
+
+    // 구현순서:
+    // 1. 키모드 입력을 받느다.
+    // 2. 입력으로부터 방향을 설정한다.
+    // 3. 방향에 따라 플레이어를 이동한다.
+
+    void Awake()
+    {
+        _characterController = GetComponent<CharacterController>();
+        _jumpChance = MaxMultiJump;
+    }
+
+    void Update()
+    {
+        if(_isDash)
+        {
+            _dashTimer += Time.deltaTime;
+            if(_dashTimer >= DashDuration) 
+            {
+                _isDash = false;
+                _dashTimer = 0f;
+            }
+        }
+
+        Move();
+        Jump();
+    }
+
+    private void Jump()
+    {
+        
+        if(_characterController.isGrounded)
+        {
+            _jumpChance = MaxMultiJump;
+        }
+
+        if(_characterController.collisionFlags == CollisionFlags.Sides)
+        {
+            if(_jumpChance != MaxMultiJump)
+            {
+                ++_jumpChance;
+            }
+        }
+
+        if(Input.GetKeyDown(KeyCode.Space) && PlayerStatus.Instance.Stamina >= JumpStamina && _jumpChance > 0)
+        {
+            --_jumpChance;
+            _yVelocity = JumpPower;
+            PlayerStatus.Instance.SetStamina(-JumpStamina);
+        }
+    }
+
+    private void Move()
+    {
+        float h = Input.GetAxisRaw("Horizontal");
+        float v = Input.GetAxisRaw("Vertical");
+
+        Vector3 dir = new Vector3(h, 0, v);
+        dir = dir.normalized;
+        // 메인 카메라를 기준으로 방향을 반환한다.
+        dir = Camera.main.transform.TransformDirection(dir);
+
+        if(_isDash)
+        {
+            dir *= DashSpeed;
+        }
+
+        // 중력 적용
+        _yVelocity += GRAVITY * Time.deltaTime;
+        dir.y = _yVelocity;
+
+        if(!Input.GetKey(KeyCode.LeftShift))
+        {
+            PlayerStatus.Instance.SetStamina(StaminaRecovery * Time.deltaTime);
+        }
+
+        if(Input.GetKey(KeyCode.LeftShift) && PlayerStatus.Instance.Stamina > 0)
+        {
+            Climbing();
+
+            Sprinting(dir);
+        }
+
+        if(Input.GetKeyDown(KeyCode.E))
+        {
+            if(!_isDash)
+            {
+                _isDash = true;
+                PlayerStatus.Instance.SetStamina(-DashStamina);
+            }
+        }
+
+        _characterController.Move(dir * MoveSpeed * Time.deltaTime);
+    }
+
+    private void Sprinting(Vector3 direction)
+    {
+        _characterController.Move(direction * SprintSpeed * Time.deltaTime);
+        PlayerStatus.Instance.SetStamina(-SprintStamina * Time.deltaTime);
+    }
+
+    private void Climbing()
+    {
+        if(_characterController.collisionFlags == CollisionFlags.Sides)
+        {
+            _yVelocity = ClimbSpeed * Time.deltaTime;
+            PlayerStatus.Instance.SetStamina(-ClimbStamina * Time.deltaTime);
+        }
+    }
+
+    // private void Dash(Vector3 direction)
+    // {
+    //     _dashTimer += Time.deltaTime;
+    //     MoveSpeed += DashSpeed;
+    //     if()
+    // }
+}
