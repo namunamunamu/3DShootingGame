@@ -3241,7 +3241,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   FirePosition: {fileID: 1586158226}
-  BulletTrail: {fileID: 0}
+  BulletTrail: {fileID: 6176212653695484014, guid: 493bdc1deab375f469aa04ac88f2ce84, type: 3}
   BulletSpeed: 150
   ThrowPower: 15
   MaxThrowPower: 5
