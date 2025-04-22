@@ -25,6 +25,10 @@ public class PlayerMove : MonoBehaviour
     private void Awake()
     {
         _characterController = GetComponent<CharacterController>();
+    }
+
+    private void Start()
+    {
         _jumpChance = PlayerStatus.Instance.MaxMultiJump;
     }
 
