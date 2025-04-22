@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -11,6 +12,12 @@ public class PoolManager : MonoBehaviour
 
     [SerializeField]
     private List<Bomb> _bombPool;
+
+    public List<ParticleSystem> VFXPrefabs;
+    public List<int> VFXPoolSize;
+
+    [SerializeField]
+    private List<ParticleSystem> _vfxPool;
 
     private void Awake()
     {
@@ -27,6 +34,45 @@ public class PoolManager : MonoBehaviour
     private void Start()
     {
         CreateBombPool();
+        CreateVFXPool();
+    }
+
+    private void CreateVFXPool()
+    {
+
+        int poolSize = 0;
+        for(int i=0; i<VFXPrefabs.Count; i++)
+        {
+            poolSize += VFXPoolSize[i];
+        } 
+
+        _vfxPool = new List<ParticleSystem>(poolSize);
+
+        for(int i=0; i<VFXPrefabs.Count; i++)
+        {
+            for(int j=0; j < VFXPoolSize[i]; j++)
+            {
+                ParticleSystem vfx = Instantiate(VFXPrefabs[i], transform);
+                _vfxPool.Add(vfx);
+                vfx.gameObject.SetActive(false);
+            }
+        }
+
+    }
+
+    public ParticleSystem GetVFX(string tag)
+    {
+        foreach(ParticleSystem vfx in _vfxPool)
+        {
+            if(vfx.tag == tag && vfx.gameObject.activeInHierarchy == false)
+            {
+                vfx.gameObject.SetActive(true);
+                return vfx;
+            }
+        }
+
+        Debug.LogError($"남은 {tag} 가 없습니다!!");
+        return null;
     }
 
     private void CreateBombPool()

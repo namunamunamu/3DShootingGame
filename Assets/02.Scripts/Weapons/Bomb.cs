@@ -6,13 +6,12 @@ public class Bomb : MonoBehaviour
     // 1. 수류탄 오브젝트 만들기
 
 
-    public GameObject ExplosionEffectPrefab;
-
     // 충돌했을 때 처리
     private void OnCollisionEnter(Collision collision)
     {
-        GameObject effectObjet = Instantiate(ExplosionEffectPrefab);
-        effectObjet.transform.position = transform.position;
+        ParticleSystem effectObjet = PoolManager.Instance.GetVFX("BombExplosionVFX");
+        effectObjet.gameObject.transform.position = transform.position;
+        effectObjet.Play();
 
         gameObject.SetActive(false);       
     }

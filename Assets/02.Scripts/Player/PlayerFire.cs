@@ -1,3 +1,4 @@
+using System.Collections;
 using TMPro;
 using UnityEngine;
 
@@ -10,12 +11,12 @@ public class PlayerFire : MonoBehaviour
     // 필요 속성
     // -발사 위치
     public GameObject FirePosition;
-    // -폭탄 프리팹
+
+    public TrailRenderer BulletTrail;
+    public float BulletSpeed;
 
     public float ThrowPower = 15f;
     public float MaxThrowPower = 5f;
-
-    public ParticleSystem BulletEffect;
 
     private bool _isReloading;
     private float _reloadTimer;
@@ -27,14 +28,20 @@ public class PlayerFire : MonoBehaviour
 
     // 목표: 마우스의 왼쪽 버튼을 누르면 카메라가 바라보는 방향으로 총을 발사하고 싶다.
     // 총알 발사(레이저 방식)
-        // 1. 왼쪽버튼 입력받기
-        // 2. 레이를 생성하고 발사위치와 진행방향을 설정
-        // 3. 레이와 부딛히 물체의 정보를 저장할 변수를 생성
-        // 4. 레이를 발사한다음,                ㄴ에 데이터가 있다면 피격이펙트 생성
+    // 1. 왼쪽버튼 입력받기
+    // 2. 레이를 생성하고 발사위치와 진행방향을 설정
+    // 3. 레이와 부딛히 물체의 정보를 저장할 변수를 생성
+    // 4. 레이를 발사한다음,                ㄴ에 데이터가 있다면 피격이펙트 생성
 
-        // Ray: 레이저(시작위치, 방향)
-        // RayCast: 레이저를 발사
-        // RayCastHit: 레이저가 물체와 부딛혔다면 그 정보를 저장하는 구조체
+    // Ray: 레이저(시작위치, 방향)
+    // RayCast: 레이저를 발사
+    // RayCastHit: 레이저가 물체와 부딛혔다면 그 정보를 저장하는 구조체
+
+
+    private void Start()
+    {
+
+    }
 
 
     private void Update()
@@ -102,9 +109,13 @@ public class PlayerFire : MonoBehaviour
             bool isHit = Physics.Raycast(ray, out hitInfo);
             if(isHit)
             {
-                BulletEffect.transform.position = hitInfo.point;
-                BulletEffect.transform.forward = hitInfo.normal;
-                BulletEffect.Play();
+                TrailRenderer trail = Instantiate(BulletTrail, FirePosition.transform.position, Quaternion.identity);
+                StartCoroutine(SpawnTrail(trail, hitInfo.point, hitInfo.normal));
+
+                ParticleSystem bulletEffect = PoolManager.Instance.GetVFX("BulletStormVFX");
+                bulletEffect.gameObject.transform.position = hitInfo.point;
+                bulletEffect.gameObject.transform.forward = hitInfo.normal;
+                bulletEffect.Play();
             }
 
             WeaponManager.Instance.AddBullet(-1);
@@ -136,5 +147,24 @@ public class PlayerFire : MonoBehaviour
                 Debug.Log("재장전 완료!");
             }
         }
+    }
+
+    private IEnumerator SpawnTrail(TrailRenderer trail, Vector3 hitPoint, Vector3 hitNormal)
+    {
+        Vector3 startPosition = trail.transform.position;
+        float distance = Vector3.Distance(trail.transform.position, hitPoint);
+        float remainingDistance = distance;
+
+        while (remainingDistance > 0)
+        {
+            trail.transform.position = Vector3.Lerp(startPosition, hitPoint, 1 - (remainingDistance / distance));
+
+            remainingDistance -= BulletSpeed * Time.deltaTime;
+
+            yield return null;
+        }
+        trail.transform.position = hitPoint;
+
+        Destroy(trail.gameObject, trail.time);
     }
 }
