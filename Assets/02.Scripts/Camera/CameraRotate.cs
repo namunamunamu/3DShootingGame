@@ -5,6 +5,10 @@ public class CameraRotate : MonoBehaviour
 {
     // 카메라 회전 스크립트
     // 목표: 마우스를 조작하면 카메라를 그 방향으로 회전시키고 싶다.
+
+    public float RotationSpeed{ set{_rotationSpeed = value;}}
+    public CameraMode CurrentCamerMode{set{_currentCameraMode = value;}}
+
     [SerializeField]
     private Transform _playerTransfrom;
 
@@ -19,10 +23,6 @@ public class CameraRotate : MonoBehaviour
 
     void Start()
     {
-        CameraManager.Instance.OnChangeCameraMode += SetCurrentCameraMode;
-        CameraManager.Instance.OnChangeCameraRotationSpeed += SetCameraRotationSpeed;
-        _rotationSpeed = CameraManager.Instance.CameraRotationSpeed;
-
         if(_currentCameraMode != CameraMode.Qurter)
         {
             Cursor.lockState = CursorLockMode.Locked;
@@ -65,15 +65,5 @@ public class CameraRotate : MonoBehaviour
         Quaternion targetRotation = Quaternion.LookRotation(dir);
 
         transform.rotation = targetRotation;
-    }
-
-    private void SetCurrentCameraMode(CameraMode cameraMode)
-    {
-        _currentCameraMode = cameraMode;
-    }
-
-    private void SetCameraRotationSpeed(float rotationSpeed)
-    {
-        _rotationSpeed = rotationSpeed;
     }
 }

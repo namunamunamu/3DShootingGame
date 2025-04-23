@@ -12,7 +12,6 @@ public class CameraFollow : MonoBehaviour
     void Start()
     {
         _targetTransform = FPSTransform;
-        CameraManager.Instance.OnChangeCameraMode += SetCarmeraTransform;
     }
 
     private void Update()
@@ -20,7 +19,7 @@ public class CameraFollow : MonoBehaviour
         transform.position = _targetTransform.position;
     }
 
-    private void SetCarmeraTransform(CameraMode cameraMode)
+    public void SetCarmeraTransform(CameraMode cameraMode)
     {
         switch (cameraMode)
         {

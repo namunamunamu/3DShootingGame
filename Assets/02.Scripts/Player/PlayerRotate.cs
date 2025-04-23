@@ -1,3 +1,4 @@
+using System;
 using Unity.Mathematics;
 using UnityEngine;
 
@@ -9,9 +10,12 @@ public class PlayerRotate : MonoBehaviour
     [SerializeField]
     private Transform _qurterCameraArm;
 
-
+    private PlayerFire _playerFire;
+    private CameraManager _mainCameraManager;
     private CameraMode _currentCameraMode;
     private float _rotationSpeed; // 카메라와 회전속도가 똑같아야 한다.
+
+    private Vector3 _recoil;
 
     private float _rotationX = 0;
     private float _rotationY = 0;
@@ -19,9 +23,12 @@ public class PlayerRotate : MonoBehaviour
 
     void Start()
     {
-        CameraManager.Instance.OnChangeCameraMode += SetCurrentCameraMode;
-        CameraManager.Instance.OnChangeCameraRotationSpeed += SetCameraRotationSpeed;
-        _rotationSpeed = CameraManager.Instance.CameraRotationSpeed;
+        _playerFire = gameObject.GetComponent<PlayerFire>();
+        _mainCameraManager = Camera.main.gameObject.GetComponent<CameraManager>();
+        _mainCameraManager.OnChangeCameraMode += SetCurrentCameraMode;
+        _mainCameraManager.OnChangeCameraRotationSpeed += SetCameraRotationSpeed;
+        _rotationSpeed = _mainCameraManager.CameraRotationSpeed;
+        _playerFire.OnFire += RotateByRecoil;
     }
 
     void Update()
@@ -42,7 +49,7 @@ public class PlayerRotate : MonoBehaviour
         _rotationY = Mathf.Clamp(_rotationY, -90f, 90f);
 
         // 3. 플레이어를 회전한다.
-        transform.eulerAngles = new Vector3(0, _rotationX, 0);
+        transform.eulerAngles = new Vector3(0, _rotationX, 0) + _recoil;
 
         if(_currentCameraMode == CameraMode.TPS)
         {
@@ -53,6 +60,15 @@ public class PlayerRotate : MonoBehaviour
         {
             _qurterCameraArm.rotation = quaternion.Euler(0,0,0);
         }
+
+        _recoil = Vector3.zero;
+    }
+
+    private void RotateByRecoil()
+    {
+        float[][] recoils = WeaponManager.Instance.GetRecoil(10, 20);
+
+        _recoil = new Vector3(UnityEngine.Random.Range(recoils[1][0], recoils[1][1]), UnityEngine.Random.Range(recoils[0][0], recoils[0][1]), 0);
     }
 
     private void SetCurrentCameraMode(CameraMode cameraMode)
