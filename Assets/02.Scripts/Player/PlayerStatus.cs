@@ -1,11 +1,8 @@
 using System;
 using UnityEngine;
 
-public class PlayerStatus : MonoBehaviour
+public class PlayerStatus : SingletonBehaviour<PlayerStatus>
 {
-    public static PlayerStatus Instance;
-
-
     public float MoveSpeed => _moveSpeed;
     public float SprintSpeed => _sprintSpeed;
     public float ClimbSpeed => _climbSpeed;
@@ -63,8 +60,6 @@ public class PlayerStatus : MonoBehaviour
 
     void Awake()
     {
-        Instance = this;
-
         InitializeStatData();
     }
 
@@ -104,6 +99,6 @@ public class PlayerStatus : MonoBehaviour
             _stamina = MaxStamina;
         }
 
-        UI_PlayerStatus.Instance.OnChangeStamina(_stamina);
+        UI_Manager.Instance.PlayerStatusPanel.OnChangeStamina(_stamina);
     }
 }

@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using TMPro;
 using UnityEngine;
@@ -14,6 +15,8 @@ public class PlayerFire : MonoBehaviour
 
     public TrailRenderer BulletTrail;
     public float BulletSpeed;
+    public int BulletDamage = 10;
+    public float BulletKnockBack = 0.5f;
 
     public float ThrowPower = 15f;
     public float MaxThrowPower = 5f;
@@ -25,6 +28,7 @@ public class PlayerFire : MonoBehaviour
 
     private float _throwTimer;
 
+    public Action OnFire;
 
     // 목표: 마우스의 왼쪽 버튼을 누르면 카메라가 바라보는 방향으로 총을 발사하고 싶다.
     // 총알 발사(레이저 방식)
@@ -36,13 +40,6 @@ public class PlayerFire : MonoBehaviour
     // Ray: 레이저(시작위치, 방향)
     // RayCast: 레이저를 발사
     // RayCastHit: 레이저가 물체와 부딛혔다면 그 정보를 저장하는 구조체
-
-
-    private void Start()
-    {
-
-    }
-
 
     private void Update()
     {
@@ -72,7 +69,6 @@ public class PlayerFire : MonoBehaviour
                 return;
             }
 
-            // GameObject bomb = Instantiate(BombPrefab);
             Bomb bomb = PoolManager.Instance.GetBomb();
             bomb.transform.position = FirePosition.transform.position;
 
@@ -95,7 +91,7 @@ public class PlayerFire : MonoBehaviour
         {
             _isReloading = false;
             _reloadTimer = 0f;
-            UI_WeaponPanel.Instance.OnReload(_isReloading);
+            UI_Manager.Instance.WeaponPanel.OnReload(_isReloading);
 
             if(WeaponManager.Instance.CurrentBullets <= 0)
             {
@@ -116,9 +112,19 @@ public class PlayerFire : MonoBehaviour
                 bulletEffect.gameObject.transform.position = hitInfo.point;
                 bulletEffect.gameObject.transform.forward = hitInfo.normal;
                 bulletEffect.Play();
+
+                if(hitInfo.collider.gameObject.CompareTag("Enemy"))
+                {
+                    Enemy enemy = hitInfo.collider.GetComponent<Enemy>();
+
+                    Damage damage = new Damage(){Value = BulletDamage, KnockBackPower = BulletKnockBack, From = gameObject };
+
+                    enemy.TakeDamage(damage);
+                }
             }
 
             WeaponManager.Instance.AddBullet(-1);
+            OnFire();
             _fireTimer = 0;
         }
     }
@@ -129,21 +135,21 @@ public class PlayerFire : MonoBehaviour
         {
             Debug.Log("재장전!");
             _isReloading = true;
-            UI_WeaponPanel.Instance.OnReload(_isReloading);
+            UI_Manager.Instance.WeaponPanel.OnReload(_isReloading);
         }
 
         if(_isReloading)
         {
             _reloadTimer += Time.deltaTime;
 
-            UI_WeaponPanel.Instance.OnReloadTimerChange(_reloadTimer, WeaponManager.Instance.ReloadTime);
+             UI_Manager.Instance.WeaponPanel.OnReloadTimerChange(_reloadTimer, WeaponManager.Instance.ReloadTime);
 
             if(_reloadTimer >= WeaponManager.Instance.ReloadTime)
             {
                 WeaponManager.Instance.ReloadMag();
                 _isReloading = false;
                 _reloadTimer = 0;
-                UI_WeaponPanel.Instance.OnReload(_isReloading);
+                 UI_Manager.Instance.WeaponPanel.OnReload(_isReloading);
                 Debug.Log("재장전 완료!");
             }
         }
