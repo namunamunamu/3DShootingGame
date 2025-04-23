@@ -5,8 +5,6 @@ using UnityEngine.UI;
 
 public class UI_WeaponPanel : MonoBehaviour
 {
-    public static UI_WeaponPanel Instance;
-
     public TextMeshProUGUI ThrowableText;
     public TextMeshProUGUI BulletText;
     public TextMeshProUGUI MagText;
@@ -24,18 +22,6 @@ public class UI_WeaponPanel : MonoBehaviour
 
     public Action<bool> OnReload;
     public Action<float, float> OnReloadTimerChange;
-
-    private void Awake()
-    {
-        if(Instance == null)
-        {
-            Instance = this;
-        }
-        else
-        {
-            Destroy(gameObject);
-        }
-    }
 
     private void Start()
     {
