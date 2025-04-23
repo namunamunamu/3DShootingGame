@@ -1,17 +1,10 @@
 using System;
 using UnityEngine;
 
-public enum CameraMode
-{
-    FPS,
-    TPS,
-    Qurter
-}
 
-
-public class CameraManager : MonoBehaviour
+public class CameraController : MonoBehaviour
 {
-    public CameraMode CurrentCameraMode = CameraMode.FPS;
+    public ECameraMode CurrentCameraMode = ECameraMode.FPS;
 
     [SerializeField]
     private float _cameraRotationSpeed = 150f;
@@ -21,7 +14,7 @@ public class CameraManager : MonoBehaviour
     private CameraRotate _cameraRotate;
 
 
-    public Action<CameraMode> OnChangeCameraMode;
+    public Action<ECameraMode> OnChangeCameraMode;
     public Action<float> OnChangeCameraRotationSpeed; 
 
 
@@ -43,7 +36,7 @@ public class CameraManager : MonoBehaviour
     {
         if(Input.GetKeyDown(KeyCode.Alpha8))
         {
-            CurrentCameraMode = CameraMode.FPS;
+            CurrentCameraMode = ECameraMode.FPS;
             OnChangeCameraMode(CurrentCameraMode);
 
             _cameraRotate.CurrentCamerMode = CurrentCameraMode;
@@ -52,7 +45,7 @@ public class CameraManager : MonoBehaviour
 
         if(Input.GetKeyDown(KeyCode.Alpha9))
         {
-            CurrentCameraMode = CameraMode.TPS;
+            CurrentCameraMode = ECameraMode.TPS;
             OnChangeCameraMode(CurrentCameraMode);
 
             _cameraRotate.CurrentCamerMode = CurrentCameraMode;
@@ -61,7 +54,7 @@ public class CameraManager : MonoBehaviour
 
         if(Input.GetKeyDown(KeyCode.Alpha0))
         {
-            CurrentCameraMode = CameraMode.Qurter;
+            CurrentCameraMode = ECameraMode.Qurter;
             OnChangeCameraMode(CurrentCameraMode);
 
             _cameraRotate.CurrentCamerMode = CurrentCameraMode;
