@@ -82,19 +82,6 @@ public class Enemy : MonoBehaviour
                 break;
             }
 
-            case EEnemyState.Damaged:
-            {
-                // Damaged();
-                break;
-            }
-
-            case EEnemyState.Die:
-            {
-                // Die();
-                break;
-            }
-
-
             default:
                 break;
         }
@@ -129,6 +116,7 @@ public class Enemy : MonoBehaviour
             CurrentState = EEnemyState.Die;
             Debug.Log($"상태전환: {CurrentState} -> Die");
             StartCoroutine(Die_Coroutine());
+            return;
         }
 
         Debug.Log("상태 전환: Any->Damaged");

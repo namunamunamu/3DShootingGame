@@ -19,19 +19,19 @@ public class CameraFollow : MonoBehaviour
         transform.position = _targetTransform.position;
     }
 
-    public void SetCarmeraTransform(CameraMode cameraMode)
+    public void SetCarmeraTransform(ECameraMode cameraMode)
     {
         switch (cameraMode)
         {
-            case CameraMode.FPS:
+            case ECameraMode.FPS:
                 _targetTransform = FPSTransform;
                 break;
 
-            case CameraMode.TPS:
+            case ECameraMode.TPS:
                 _targetTransform = TPSTransform;
                 break;    
 
-            case CameraMode.Qurter:
+            case ECameraMode.Qurter:
                 _targetTransform = QurterTransform;
                 break;
 

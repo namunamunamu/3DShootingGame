@@ -1546,7 +1546,7 @@ GameObject:
   - component: {fileID: 718100463}
   m_Layer: 0
   m_Name: Enemy
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1632,10 +1632,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   CurrentState: 0
+  Health: 100
   FindDistance: 7
   ReturnDistance: 15
   AttackDistance: 2.5
   MoveSpeed: 3.3
+  AttackCoolTime: 2
+  DamageTime: 0.5
+  DeathTime: 2
+  IdleTime: 3
+  PatrolDistance: 10
+  PatrolPointCount: 3
+  PatrolPoints: []
 --- !u!143 &718100464
 CharacterController:
   m_ObjectHideFlags: 0
@@ -3079,7 +3087,7 @@ MeshRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1586158226}
-  m_Enabled: 0
+  m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
@@ -3419,6 +3427,8 @@ MonoBehaviour:
   FirePosition: {fileID: 1586158226}
   BulletTrail: {fileID: 6176212653695484014, guid: 493bdc1deab375f469aa04ac88f2ce84, type: 3}
   BulletSpeed: 150
+  BulletDamage: 10
+  BulletKnockBack: 0.5
   ThrowPower: 15
   MaxThrowPower: 5
 --- !u!1 &1814533761
