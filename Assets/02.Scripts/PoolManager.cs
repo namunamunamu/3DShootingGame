@@ -1,12 +1,8 @@
-using System;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 
-public class PoolManager : MonoBehaviour
+public class PoolManager : SingletonBehaviour<PoolManager>
 {
-    public static PoolManager Instance;
-
     public Bomb BombPrefab;
     public int BombPoolSize;
 
@@ -19,17 +15,6 @@ public class PoolManager : MonoBehaviour
     [SerializeField]
     private List<ParticleSystem> _vfxPool;
 
-    private void Awake()
-    {
-        if(Instance == null)
-        {
-            Instance = this;
-        }
-        else
-        {
-            Destroy(gameObject);
-        }
-    }
 
     private void Start()
     {

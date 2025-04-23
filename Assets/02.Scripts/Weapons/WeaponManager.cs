@@ -1,11 +1,10 @@
 using System;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
-public class WeaponManager : MonoBehaviour
+public class WeaponManager : SingletonBehaviour<WeaponManager>
 {
-    public static WeaponManager Instance;
-
     public int MaxGrenades = 3;
     public int MaxMags = 5;
     public int MagSize = 50;
@@ -40,15 +39,6 @@ public class WeaponManager : MonoBehaviour
 
     private void Awake()
     {
-        if(Instance == null)
-        {
-            Instance = this;
-        }
-        else
-        {
-            Destroy(gameObject);
-        }
-
         _currentBullets = MagSize;
         _currentGrenades = MaxGrenades;
         _currentMags = MaxMags;
@@ -143,5 +133,21 @@ public class WeaponManager : MonoBehaviour
     private void SetFireTime()
     {
         _fireTime = ONEMINUTE / FireRate;
+    }
+
+    public float[][] GetRecoil(float verticalRecoil, float horizontalrecoil)
+    {
+        float verticalRecoilRate = 0.7f;
+        float horizontailRecoilRate = 0.2f;
+
+        int leftRecoil = (int)(verticalRecoil / verticalRecoilRate);
+        int minHorizontailRecoil = (int)(horizontalrecoil / horizontailRecoilRate);
+
+        float[] verticalRecoilRange = {-leftRecoil, verticalRecoil - leftRecoil};
+        float[] horizontalRecoilRange = {minHorizontailRecoil, horizontalrecoil};
+
+        float[][] Recoils = {verticalRecoilRange, horizontalRecoilRange};
+
+        return Recoils;
     }
 }
