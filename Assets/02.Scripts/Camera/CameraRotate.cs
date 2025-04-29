@@ -55,7 +55,7 @@ public class CameraRotate : MonoBehaviour
 
         // 2. 마우스 입력으로부터 회전할 양만큼 누적시킨다.
         _rotationX += _recoil.x + (mouseX * _rotationSpeed * Time.deltaTime);
-        _rotationY += -_recoil.y + (mouseY * _rotationSpeed * Time.deltaTime);
+        _rotationY += _recoil.y + (mouseY * _rotationSpeed * Time.deltaTime);
         _rotationY = Mathf.Clamp(_rotationY, -90f, 90f);
 
         // 3. 카메라를 회전한다.
@@ -72,8 +72,6 @@ public class CameraRotate : MonoBehaviour
 
     private void RotateByRecoil()
     {
-        float[][] recoils = WeaponManager.Instance.GetRecoil(3, 1);
-
-        _recoil = new Vector3(Random.Range(recoils[1][0], recoils[1][1]), Random.Range(recoils[0][0], recoils[0][1]), 0);
+        _recoil = WeaponManager.Instance.GetRecoil();
     }
 }

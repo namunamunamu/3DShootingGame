@@ -4783,7 +4783,7 @@ GameObject:
   - component: {fileID: 11400000}
   m_Layer: 0
   m_Name: WFX_Explosion
-  m_TagString: Untagged
+  m_TagString: BombExplosionVFX
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -4821,7 +4821,7 @@ ParticleSystem:
   serializedVersion: 8
   lengthInSec: 4
   simulationSpeed: 1
-  stopAction: 0
+  stopAction: 1
   cullingMode: 3
   ringBufferMode: 0
   ringBufferLoopRange: {x: 0, y: 1}

@@ -1,35 +1,22 @@
-using System;
-using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
 public class PlayerMove : MonoBehaviour
 {
-    // 목표 : WASD를 누르면 캐릭터를 이동시키고 싶다.
-    // 필요 속성:
-    // - 이동속도
-    private CharacterController _characterController;
+    private PlayerController _playerController;
+
+    private PlayerStatus _playerData;
 
     private const float GRAVITY = -9.8f;
     private float _yVelocity = 0f;
-
     private int _jumpChance;
     private bool _isDash = false;
     private float _dashTimer=0f;
 
-
-    // 구현순서:
-    // 1. 키모드 입력을 받느다.
-    // 2. 입력으로부터 방향을 설정한다.
-    // 3. 방향에 따라 플레이어를 이동한다.
-
-    private void Awake()
-    {
-        _characterController = GetComponent<CharacterController>();
-    }
-
     private void Start()
     {
-        _jumpChance = PlayerStatus.Instance.MaxMultiJump;
+        _playerController = GetComponent<PlayerController>();
+        _jumpChance = _playerController.PlayerData.MaxMultiJump;
+        _playerData = _playerController.PlayerData;
     }
 
     void Update()
@@ -39,30 +26,6 @@ public class PlayerMove : MonoBehaviour
         Jump();
     }
 
-    private void Jump()
-    {
-        
-        if(_characterController.isGrounded)
-        {
-            _jumpChance = PlayerStatus.Instance.MaxMultiJump;
-        }
-
-        if(_characterController.collisionFlags == CollisionFlags.Sides)
-        {
-            if(_jumpChance != PlayerStatus.Instance.MaxMultiJump)
-            {
-                ++_jumpChance;
-            }
-        }
-
-        if(Input.GetKeyDown(KeyCode.Space) && PlayerStatus.Instance.Stamina >= PlayerStatus.Instance.JumpStamina && _jumpChance > 0)
-        {
-            --_jumpChance;
-            _yVelocity = PlayerStatus.Instance.JumpPower;
-            PlayerStatus.Instance.SetStamina(-PlayerStatus.Instance.JumpStamina);
-        }
-    }
-
     private void Move()
     {
         float h = Input.GetAxisRaw("Horizontal");
@@ -70,12 +33,11 @@ public class PlayerMove : MonoBehaviour
 
         Vector3 dir = new Vector3(h, 0, v);
         dir = dir.normalized;
-        // 메인 카메라를 기준으로 방향을 반환한다.
         dir = Camera.main.transform.TransformDirection(dir);
 
         if(_isDash)
         {
-            dir *= PlayerStatus.Instance.DashPower;
+            dir *= _playerController.PlayerData.DashPower;
         }
 
         // 중력 적용
@@ -84,10 +46,10 @@ public class PlayerMove : MonoBehaviour
 
         if(!Input.GetKey(KeyCode.LeftShift))
         {
-            PlayerStatus.Instance.SetStamina(PlayerStatus.Instance.StaminaRecovery * Time.deltaTime);
+           _playerController.PlayerData.SetStamina(_playerController.PlayerData.StaminaRecovery * Time.deltaTime);
         }
 
-        if(Input.GetKey(KeyCode.LeftShift) && PlayerStatus.Instance.Stamina > 0)
+        if(Input.GetKey(KeyCode.LeftShift) && _playerController.PlayerData.Stamina > 0)
         {
             Climbing();
 
@@ -99,25 +61,50 @@ public class PlayerMove : MonoBehaviour
             if(!_isDash)
             {
                 _isDash = true;
-                PlayerStatus.Instance.SetStamina(-PlayerStatus.Instance.DashStamina);
+                _playerController.PlayerData.SetStamina(-_playerController.PlayerData.DashStamina);
             }
         }
 
-        _characterController.Move(dir * PlayerStatus.Instance.MoveSpeed * Time.deltaTime);
+        _playerController.CharacterController.Move(dir * _playerController.PlayerData.MoveSpeed * Time.deltaTime);
     }
+    
+    private void Jump()
+    {
+        
+        if(_playerController.CharacterController.isGrounded)
+        {
+            _jumpChance = _playerController.PlayerData.MaxMultiJump;
+        }
+
+        if(_playerController.CharacterController.collisionFlags == CollisionFlags.Sides)
+        {
+            if(_jumpChance != _playerController.PlayerData.MaxMultiJump)
+            {
+                ++_jumpChance;
+            }
+        }
+
+        if(Input.GetKeyDown(KeyCode.Space) && _playerController.PlayerData.Stamina >= _playerController.PlayerData.JumpStamina && _jumpChance > 0)
+        {
+            --_jumpChance;
+            _yVelocity = _playerController.PlayerData.JumpPower;
+            _playerController.PlayerData.SetStamina(-_playerController.PlayerData.JumpStamina);
+        }
+    }
+
 
     private void Sprinting(Vector3 direction)
     {
-        _characterController.Move(direction * PlayerStatus.Instance.SprintSpeed * Time.deltaTime);
-        PlayerStatus.Instance.SetStamina(-PlayerStatus.Instance.SprintStamina * Time.deltaTime);
+        _playerController.CharacterController.Move(direction * _playerController.PlayerData.SprintSpeed * Time.deltaTime);
+        _playerController.PlayerData.SetStamina(-_playerController.PlayerData.SprintStamina * Time.deltaTime);
     }
 
     private void Climbing()
     {
-        if(_characterController.collisionFlags == CollisionFlags.Sides)
+        if(_playerController.CharacterController.collisionFlags == CollisionFlags.Sides)
         {
-            _yVelocity = PlayerStatus.Instance.ClimbSpeed * Time.deltaTime;
-            PlayerStatus.Instance.SetStamina(-PlayerStatus.Instance.ClimbStamina * Time.deltaTime);
+            _yVelocity = _playerController.PlayerData.ClimbSpeed * Time.deltaTime;
+            _playerController.PlayerData.SetStamina(-_playerController.PlayerData.ClimbStamina * Time.deltaTime);
         }
     }
 
@@ -126,7 +113,7 @@ public class PlayerMove : MonoBehaviour
         if(_isDash)
         {
             _dashTimer += Time.deltaTime;
-            if(_dashTimer >= PlayerStatus.Instance.DashDuration) 
+            if(_dashTimer >= _playerController.PlayerData.DashDuration) 
             {
                 _isDash = false;
                 _dashTimer = 0f;
@@ -134,3 +121,4 @@ public class PlayerMove : MonoBehaviour
         }
     }
 }
+

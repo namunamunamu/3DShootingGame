@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Generic;
-using TMPro;
 using UnityEngine;
 
 public class WeaponManager : SingletonBehaviour<WeaponManager>
@@ -135,19 +133,21 @@ public class WeaponManager : SingletonBehaviour<WeaponManager>
         _fireTime = ONEMINUTE / FireRate;
     }
 
-    public float[][] GetRecoil(float verticalRecoil, float horizontalrecoil)
+    public Vector3 GetRecoil()
     {
-        float verticalRecoilRate = 0.7f;
-        float horizontailRecoilRate = 0.2f;
+        // TODO
+        // GetRecoilValue
+        float verticalRecoil = 5f;
+        float horizontalrecoil = 3f;
 
-        int leftRecoil = (int)(verticalRecoil / verticalRecoilRate);
-        int minHorizontailRecoil = (int)(horizontalrecoil / horizontailRecoilRate);
+        // GetRecoilPattren;( rate : 0 - 1)
+        float verticalRecoilRate = 0.2f;
+        float horizontailRecoilRate = 0.5f;
 
-        float[] verticalRecoilRange = {-leftRecoil, verticalRecoil - leftRecoil};
-        float[] horizontalRecoilRange = {minHorizontailRecoil, horizontalrecoil};
+        float leftRecoil = horizontalrecoil * horizontailRecoilRate;
+        float minVerticalRecoil = verticalRecoil * verticalRecoilRate;
 
-        float[][] Recoils = {verticalRecoilRange, horizontalRecoilRange};
-
-        return Recoils;
+        Vector3 recoil = new Vector3(UnityEngine.Random.Range(-leftRecoil, horizontalrecoil - leftRecoil), UnityEngine.Random.Range(minVerticalRecoil,  verticalRecoil), 0);
+        return recoil;
     }
 }

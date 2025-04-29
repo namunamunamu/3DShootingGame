@@ -1,24 +1,17 @@
-using System.Collections;
 using System.Collections.Generic;
-using Unity.Android.Gradle.Manifest;
+using System.Collections;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class Enemy : MonoBehaviour
 {   
+    [SerializeField]
+    private EnemyDataSO enemyData;
+
     // 2. 현재 상태를 지정
     public EEnemyState CurrentState = EEnemyState.Idle;
 
-    public int Health           = 100;
-    public float FindDistance   = 7f;
-    public float ReturnDistance = 10f;
-    public float AttackDistance = 2.5f;
-    public float MoveSpeed      = 3.3f;
-    public float AttackCoolTime = 2f;
-    public float DamageTime     = 0.5f;
-    public float DeathTime      = 2f;
-    public float IdleTime       = 3f;
-    public float PatrolDistance = 10f;
-    public int PatrolPointCount = 3;
+
     public List<Vector3> PatrolPoints;
 
     private int _nextPointIndex;
@@ -27,58 +20,61 @@ public class Enemy : MonoBehaviour
     private float _idleTimer;
 
     private GameObject _player;
-    private CharacterController _characterController;
+    private NavMeshAgent _agent;
     private Vector3 _initialPosition;
-    private Vector3 _gravity;
-    private const float Gravity = -9.8f;
+    private Rigidbody _rigidBody;
+    private const float MINDISTANCE = 0.2f;
+
+    [SerializeField]
+    private EnemyStateMachine enemyStateMachine;
 
     private void Awake()
     {
         _initialPosition = transform.position;
         InitializePartolPoint();
-        _gravity = new Vector3(0, Gravity, 0);
     }
 
 
     private void Start()
     {
-        _characterController = GetComponent<CharacterController>();
+        _rigidBody = GetComponent<Rigidbody>();
+        _agent = GetComponent<NavMeshAgent>();
+        _agent.speed = enemyData.MoveSpeed;
+
         _player = GameObject.FindWithTag("Player");
     }
 
     private void Update()
     {
-        _characterController.Move(_gravity * Time.deltaTime);
-
         switch(CurrentState)
         {
             case EEnemyState.Idle:
             {
-                Idle();
+                // Idle();
                 break;
             }
 
             case EEnemyState.Patrol:
             {
-                Patrol();
+                // Patrol();
                 break;
             }
 
             case EEnemyState.Trace:
             {
-                Trace();
+                // Trace();
                 break;
             }
 
             case EEnemyState.Attack:
             {
-                Attack();
+                // Attack();
                 break;
             }
 
             case EEnemyState.Return:
             {
-                Return();
+                // Return();
                 break;
             }
 
@@ -91,27 +87,28 @@ public class Enemy : MonoBehaviour
     {
         PatrolPoints.Clear();
         PatrolPoints.Add(_initialPosition);
-        for(int i=1; i<PatrolPointCount; i++)
+        for(int i=1; i<enemyData.PatrolPointCount; i++)
         {
-            PatrolPoints.Add(new Vector3(Random.Range(_initialPosition.x - PatrolDistance, _initialPosition.x + PatrolDistance),
+            PatrolPoints.Add(new Vector3(Random.Range(_initialPosition.x - enemyData.PatrolDistance, _initialPosition.x + enemyData.PatrolDistance),
                                          1,
-                                         Random.Range(_initialPosition.z - PatrolDistance, _initialPosition.z + PatrolDistance)));
+                                         Random.Range(_initialPosition.z - enemyData.PatrolDistance, _initialPosition.z + enemyData.PatrolDistance)));
         }
     }
 
     public void TakeDamage(Damage damage)
     {
-        if(CurrentState == EEnemyState.Damaged || CurrentState == EEnemyState.Die)
+        if(CurrentState == EEnemyState.Die)
         {
             return;
         }
 
-        Health -= damage.Value;
-        Debug.Log($"Health: {Health}");
         Vector3 knockBackDirecton = (transform.position - damage.From.transform.position).normalized;
-        _characterController.Move(knockBackDirecton * damage.KnockBackPower);
+        _rigidBody.AddForce(knockBackDirecton * damage.KnockBackPower);
 
-        if(Health <= 0)
+        enemyData.Health -= damage.Value;
+        Debug.Log($"Health: {enemyData.Health}");
+
+        if(enemyData.Health <= 0)
         {
             CurrentState = EEnemyState.Die;
             Debug.Log($"상태전환: {CurrentState} -> Die");
@@ -119,16 +116,19 @@ public class Enemy : MonoBehaviour
             return;
         }
 
-        Debug.Log("상태 전환: Any->Damaged");
-        CurrentState = EEnemyState.Damaged;
-        StartCoroutine(Damaged_Coroutine());
+        if(CurrentState != EEnemyState.Damaged)
+        {
+            Debug.Log("상태 전환: Any->Damaged");
+            CurrentState = EEnemyState.Damaged;
+            StartCoroutine(Damaged_Coroutine(damage));    
+        }
     }
 
-    // 3. 상태 함수들을 구현
+            // 3. 상태 함수들을 구현
     private void Idle()
     {
         _idleTimer += Time.deltaTime;
-        if(_idleTimer >= IdleTime)
+        if(_idleTimer >= enemyData.IdleTime)
         {
             Debug.Log("상태전환: Idle -> Patrol");
             CurrentState = EEnemyState.Patrol;
@@ -136,7 +136,7 @@ public class Enemy : MonoBehaviour
             return;
         }
         
-        if(Vector3.Distance(transform.position, _player.transform.position) < FindDistance)
+        if(Vector3.Distance(transform.position, _player.transform.position) < enemyData.FindDistance)
         {
             Debug.Log("상태 전환: Idle->Trace");
             CurrentState = EEnemyState.Trace;
@@ -145,43 +145,40 @@ public class Enemy : MonoBehaviour
 
     private void Trace()
     {
-        if(Vector3.Distance(transform.position, _player.transform.position) >= ReturnDistance)
+        if(Vector3.Distance(transform.position, _player.transform.position) >= enemyData.ReturnDistance)
         {
             Debug.Log("상태전환: Trace -> Return");
             CurrentState = EEnemyState.Return;
             return;
         }
 
-        if(Vector3.Distance(transform.position, _player.transform.position) <= AttackDistance)
+        if(Vector3.Distance(transform.position, _player.transform.position) <= enemyData.AttackDistance)
         {
             Debug.Log("상태전환: Trace -> Attack");
             CurrentState = EEnemyState.Attack;
             return;
         }
-
-        Vector3 dir = (_player.transform.position - transform.position).normalized;
-        _characterController.Move(dir * MoveSpeed * Time.deltaTime);
+        _agent.SetDestination(_player.transform.position);
     }
 
     private void Patrol()
     {
-        if(Vector3.Distance(transform.position, _player.transform.position) < FindDistance)
+        if(Vector3.Distance(transform.position, _player.transform.position) < enemyData.FindDistance)
         {
             Debug.Log("상태 전환: Patrol->Trace");
             CurrentState = EEnemyState.Trace;
             return;
         }
+        _agent.SetDestination(PatrolPoints[_nextPointIndex]);
 
-        Vector3 dir = (PatrolPoints[_nextPointIndex] - transform.position).normalized;
-        _characterController.Move(dir * MoveSpeed * Time.deltaTime);
-
-        if(Vector3.Distance(transform.position, PatrolPoints[_nextPointIndex]) <= _characterController.minMoveDistance*100)
+        float distance = Vector2.Distance(new Vector2(transform.position.x, transform.position.z), new Vector2(PatrolPoints[_nextPointIndex].x, PatrolPoints[_nextPointIndex].z));
+        if(distance <= MINDISTANCE)
         {
             Debug.Log("상태 전환: Patrol->Idle");
             CurrentState = EEnemyState.Idle;
 
             _nextPointIndex++;
-            if(_nextPointIndex >= PatrolPointCount)
+            if(_nextPointIndex >= enemyData.PatrolPointCount)
             {
                 InitializePartolPoint();
                 _nextPointIndex = 0;
@@ -191,28 +188,28 @@ public class Enemy : MonoBehaviour
 
     private void Return()
     {
-        if(Vector3.Distance(transform.position, _player.transform.position) < FindDistance)
+        if(Vector3.Distance(transform.position, _player.transform.position) < enemyData.FindDistance)
         {
             Debug.Log("상태 전환: return->Trace");
             CurrentState = EEnemyState.Trace;
             return;
         }
 
-        if(Vector3.Distance(transform.position, PatrolPoints[_nextPointIndex]) <= _characterController.minMoveDistance*100)
+        float distance = Vector2.Distance(new Vector2(transform.position.x, transform.position.z), 
+                                          new Vector2(PatrolPoints[_nextPointIndex].x, PatrolPoints[_nextPointIndex].z));
+        if(distance <= MINDISTANCE)
         {
             Debug.Log("상태전환: Return -> Idle");
             transform.position = PatrolPoints[_nextPointIndex];
             CurrentState = EEnemyState.Idle;
             return;
         }
-
-        Vector3 dir = (PatrolPoints[_nextPointIndex] - transform.position).normalized;
-        _characterController.Move(dir * MoveSpeed * Time.deltaTime);
+        _agent.SetDestination(PatrolPoints[_nextPointIndex]);
     }
 
     private void Attack()
     {
-        if(Vector3.Distance(transform.position, _player.transform.position) > AttackDistance)
+        if(Vector3.Distance(transform.position, _player.transform.position) > enemyData.AttackDistance)
         {
             Debug.Log("상태전환: Attack -> Trace");
             CurrentState = EEnemyState.Trace;
@@ -221,23 +218,27 @@ public class Enemy : MonoBehaviour
         }
 
         _attackTimer += Time.deltaTime;
-        if(_attackTimer >= AttackCoolTime)
+        if(_attackTimer >= enemyData.AttackCoolTime)
         {
             Debug.Log("공격!");
             _attackTimer = 0f;
         }
     }
 
-    private IEnumerator Damaged_Coroutine()
+    private IEnumerator Damaged_Coroutine(Damage damage)
     {
-        yield return new WaitForSeconds(DamageTime);
+        _agent.ResetPath();
+
+        yield return new WaitForSeconds(enemyData.DamageTime);
         Debug.Log("상태전환: Damaged -> Trace");
         CurrentState = EEnemyState.Trace;
     }
 
     private IEnumerator Die_Coroutine()
     {
-        yield return new WaitForSeconds(DeathTime);
+        yield return new WaitForSeconds(enemyData.DeathTime);
         gameObject.SetActive(false);
     }
+
+
 }

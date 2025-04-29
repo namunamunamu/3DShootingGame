@@ -1,22 +1,15 @@
 using System;
 using System.Collections;
-using TMPro;
 using UnityEngine;
 
 public class PlayerFire : MonoBehaviour
 {
-    // 2. 오른쪽 버튼 입력 받기
-    // 3. 발사 위치에 수류탄 생성하기
-    // 4. 생성된 수류탄을 카메라 방향으로 물리적으로 던지기
-
-    // 필요 속성
-    // -발사 위치
     public GameObject FirePosition;
 
     public TrailRenderer BulletTrail;
     public float BulletSpeed;
     public int BulletDamage = 10;
-    public float BulletKnockBack = 0.5f;
+    public float BulletKnockBack = 1000f;
 
     public float ThrowPower = 15f;
     public float MaxThrowPower = 5f;
@@ -29,17 +22,6 @@ public class PlayerFire : MonoBehaviour
     private float _throwTimer;
 
     public Action OnFire;
-
-    // 목표: 마우스의 왼쪽 버튼을 누르면 카메라가 바라보는 방향으로 총을 발사하고 싶다.
-    // 총알 발사(레이저 방식)
-    // 1. 왼쪽버튼 입력받기
-    // 2. 레이를 생성하고 발사위치와 진행방향을 설정
-    // 3. 레이와 부딛히 물체의 정보를 저장할 변수를 생성
-    // 4. 레이를 발사한다음,                ㄴ에 데이터가 있다면 피격이펙트 생성
-
-    // Ray: 레이저(시작위치, 방향)
-    // RayCast: 레이저를 발사
-    // RayCastHit: 레이저가 물체와 부딛혔다면 그 정보를 저장하는 구조체
 
     private void Update()
     {
@@ -74,7 +56,6 @@ public class PlayerFire : MonoBehaviour
 
             Rigidbody bombRigidBody = bomb.GetComponent<Rigidbody>();
             bombRigidBody.AddForce(Camera.main.transform.forward * (ThrowPower + _throwTimer), ForceMode.Impulse);
-            Debug.Log(ThrowPower + _throwTimer);
             bombRigidBody.AddTorque(Vector3.one);
 
             WeaponManager.Instance.AddGrenadeCount(-1);
@@ -99,14 +80,14 @@ public class PlayerFire : MonoBehaviour
                 return;
             }
 
-            Ray ray = new Ray(FirePosition.transform.position, Camera.main.transform.forward);
+            Ray ray = new Ray(Camera.main.transform.position, Camera.main.transform.forward);
             RaycastHit hitInfo = new RaycastHit();
 
             bool isHit = Physics.Raycast(ray, out hitInfo);
             if(isHit)
             {
                 TrailRenderer trail = Instantiate(BulletTrail, FirePosition.transform.position, Quaternion.identity);
-                StartCoroutine(SpawnTrail(trail, hitInfo.point, hitInfo.normal));
+                StartCoroutine(SpawnTrail(trail, hitInfo.point));
 
                 ParticleSystem bulletEffect = PoolManager.Instance.GetVFX("BulletStormVFX");
                 bulletEffect.gameObject.transform.position = hitInfo.point;
@@ -116,6 +97,15 @@ public class PlayerFire : MonoBehaviour
                 if(hitInfo.collider.gameObject.CompareTag("Enemy"))
                 {
                     Enemy enemy = hitInfo.collider.GetComponent<Enemy>();
+
+                    Damage damage = new Damage(){Value = BulletDamage, KnockBackPower = BulletKnockBack, From = gameObject };
+
+                    enemy.TakeDamage(damage);
+                }
+
+                if(hitInfo.collider.gameObject.CompareTag("Barrel"))
+                {
+                    Barrel enemy = hitInfo.collider.GetComponent<Barrel>();
 
                     Damage damage = new Damage(){Value = BulletDamage, KnockBackPower = BulletKnockBack, From = gameObject };
 
@@ -155,7 +145,7 @@ public class PlayerFire : MonoBehaviour
         }
     }
 
-    private IEnumerator SpawnTrail(TrailRenderer trail, Vector3 hitPoint, Vector3 hitNormal)
+    private IEnumerator SpawnTrail(TrailRenderer trail, Vector3 hitPoint)
     {
         Vector3 startPosition = trail.transform.position;
         float distance = Vector3.Distance(trail.transform.position, hitPoint);

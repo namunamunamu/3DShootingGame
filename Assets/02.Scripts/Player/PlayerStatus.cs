@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-public class PlayerStatus : SingletonBehaviour<PlayerStatus>
+public class PlayerStatus : MonoBehaviour
 {
     public float MoveSpeed => _moveSpeed;
     public float SprintSpeed => _sprintSpeed;
@@ -57,18 +57,7 @@ public class PlayerStatus : SingletonBehaviour<PlayerStatus>
     [SerializeField]
     private float _jumpStamina;
 
-
-    void Awake()
-    {
-        InitializeStatData();
-    }
-
-    void Start()
-    {
-        SetStamina(MaxStamina);
-    }
-
-    private void InitializeStatData()
+    public void InitializeStatData()
     {
         _moveSpeed = _statData._moveSpeed;
         _sprintSpeed = _statData._sprintSpeed;
@@ -84,6 +73,8 @@ public class PlayerStatus : SingletonBehaviour<PlayerStatus>
         _dashDuration = _statData._dashDuration;
         _climbStamina = _statData._climbStamina;
         _jumpStamina = _statData._jumpStamina;
+
+        SetStamina(MaxStamina);
     }
 
     public void SetStamina(float value)
