@@ -2109,9 +2109,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d6f47edd89f8ad54ea28feebe0c743c1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  enemyData: {fileID: 0}
-  CurrentState: 0
-  PatrolPoints: []
+  EnemyData: {fileID: 11400000, guid: d38dcf7a7dc86d642941bb1ed6ad1a06, type: 2}
+  MINDISTANCE: 0.2
 --- !u!195 &718100465
 NavMeshAgent:
   m_ObjectHideFlags: 0

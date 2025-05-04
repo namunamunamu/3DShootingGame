@@ -1,9 +1,11 @@
 
+using UnityEngine;
+
 public interface IEnemeyState
 {
-    public void InitializeState(EnemyBase enemy);
+    public void InitializeState(EnemyStateMachine stateMachine, EnemyBase enemy, GameObject player);
 
-    public void DoState();
+    public void ExcuteState();
 
-    public void ExitState();
+    public void EndState();
 }
