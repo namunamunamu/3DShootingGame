@@ -39,7 +39,7 @@ public class PlayerRotate : MonoBehaviour
 
         // 3. 플레이어를 회전한다.
         transform.eulerAngles = new Vector3(0, _rotationX, 0);
-        WeaponTranform.localEulerAngles = new Vector3(-_rotationY, 0, 0);
+        WeaponTranform.localEulerAngles = new Vector3(_rotationY, 180, 0);
 
         if(_currentCameraMode == ECameraMode.TPS)
         {

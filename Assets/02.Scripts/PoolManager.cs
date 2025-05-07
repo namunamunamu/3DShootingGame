@@ -1,25 +1,42 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class PoolManager : SingletonBehaviour<PoolManager>
 {
+    [Header("Enemy Pool")]
+    public List<GameObject> EnemyPrefabs;
+    public List<int> EnemyPoolSize;
+    private List<GameObject>[] _enemiesPools;
+
+    [Header("Boom Pool")]
     public Bomb BombPrefab;
     public int BombPoolSize;
 
     [SerializeField]
     private List<Bomb> _bombPool;
 
+
+    [Header("VFX Pool")]
     public List<ParticleSystem> VFXPrefabs;
     public List<int> VFXPoolSize;
 
     [SerializeField]
     private List<ParticleSystem> _vfxPool;
 
+    private GameObject _player;
 
-    private void Start()
+
+    private void Awake()
     {
         CreateBombPool();
         CreateVFXPool();
+        CreateEnemyPool();
+    }
+
+    private void Start()
+    {
+        _player = GameObject.FindWithTag("Player");
     }
 
     private void CreateVFXPool()
@@ -88,4 +105,50 @@ public class PoolManager : SingletonBehaviour<PoolManager>
     }
 
 
+    private void CreateEnemyPool()
+    {
+        _enemiesPools = new List<GameObject>[EnemyPrefabs.Count];
+        for(int i=0; i<EnemyPrefabs.Count; i++)
+        {
+            _enemiesPools[i] = new List<GameObject>(EnemyPoolSize[i]);
+        }
+
+        for(int i=0; i<EnemyPrefabs.Count; i++)
+        {
+            for(int j=0; j < EnemyPoolSize[i]; j++)
+            {
+                GameObject enemy = Instantiate(EnemyPrefabs[i], transform);
+                _enemiesPools[i].Add(enemy);
+                enemy.gameObject.SetActive(false);
+            }
+        }
+    }
+
+    public GameObject GetEnemy(Type type)
+    {
+        int index = 0;
+        if(type == typeof(Enemy))
+        {
+            Debug.Log("Basic");
+            index = (int)EEnemyType.Basic;
+        }
+        if(type == typeof(ChaseEnemy))
+        {
+            Debug.Log("Chase");
+            index = (int)EEnemyType.Chase;
+        }
+
+        foreach(GameObject enemy in _enemiesPools[index])
+        {
+            if(enemy.activeInHierarchy == false)
+            {
+                enemy.gameObject.SetActive(true);
+                enemy.GetComponent<EnemyBase>().Initialize(_player);
+                return enemy;
+            }
+        }
+
+        Debug.LogError($"남은 {type} 가 없습니다!!");
+        return null;
+    }
 }

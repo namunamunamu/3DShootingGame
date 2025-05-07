@@ -10,19 +10,10 @@ public class Enemy : EnemyBase
     private List<Vector3> _patrolPoints = new List<Vector3>();
 
 
-    private void Awake()
+    protected override void Awake()
     {
+        base.Awake();
         InitializePartolPoint();
-    }
-
-    protected override void SetStateDictionary()
-    {
-        base.SetStateDictionary();
-
-        EnemyStateDict.Add(EEnemyState.Idle, new EnemyIdleState());
-        EnemyStateDict.Add(EEnemyState.Trace, new EnemyTraceState());
-        EnemyStateDict.Add(EEnemyState.Patrol, new EnemyPatrolState());
-        EnemyStateDict.Add(EEnemyState.Return, new EnemyReturnState());
     }
 
     public void InitializePartolPoint()

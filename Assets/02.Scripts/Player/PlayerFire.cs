@@ -86,6 +86,24 @@ public class PlayerFire : MonoBehaviour
             bool isHit = Physics.Raycast(ray, out hitInfo);
             if(isHit)
             {
+                if(hitInfo.collider.gameObject.CompareTag("Enemy"))
+                {
+                    Debug.Log("Enemy Hit");
+                    EnemyBase enemy = hitInfo.collider.GetComponent<EnemyBase>();
+                    Damage damage = new Damage(){Value = BulletDamage, KnockBackPower = BulletKnockBack, From = gameObject };
+
+                    enemy.TakeDamage(damage);
+                }
+
+                if(hitInfo.collider.gameObject.CompareTag("Barrel"))
+                {
+                    Debug.Log("Barrel Hit");
+                    Barrel barrel = hitInfo.collider.GetComponent<Barrel>();
+                    Damage damage = new Damage(){Value = BulletDamage, KnockBackPower = BulletKnockBack, From = gameObject };
+
+                    barrel.TakeDamage(damage);
+                }
+
                 TrailRenderer trail = Instantiate(BulletTrail, FirePosition.transform.position, Quaternion.identity);
                 StartCoroutine(SpawnTrail(trail, hitInfo.point));
 
@@ -94,23 +112,7 @@ public class PlayerFire : MonoBehaviour
                 bulletEffect.gameObject.transform.forward = hitInfo.normal;
                 bulletEffect.Play();
 
-                if(hitInfo.collider.gameObject.CompareTag("Enemy"))
-                {
-                    Enemy enemy = hitInfo.collider.GetComponent<Enemy>();
-
-                    Damage damage = new Damage(){Value = BulletDamage, KnockBackPower = BulletKnockBack, From = gameObject };
-
-                    enemy.TakeDamage(damage);
-                }
-
-                if(hitInfo.collider.gameObject.CompareTag("Barrel"))
-                {
-                    Barrel enemy = hitInfo.collider.GetComponent<Barrel>();
-
-                    Damage damage = new Damage(){Value = BulletDamage, KnockBackPower = BulletKnockBack, From = gameObject };
-
-                    enemy.TakeDamage(damage);
-                }
+                
             }
 
             WeaponManager.Instance.AddBullet(-1);

@@ -18,6 +18,7 @@ public class EnemyStateMachine
         _stateDict = stateDict;
         _enemy = enemy;
         _currentStateType = EEnemyState.Idle;
+        _currentState = new EnemyIdleState();
     }
 
     public void SetPlayer(GameObject player)
