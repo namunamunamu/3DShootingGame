@@ -19,6 +19,8 @@ MonoBehaviour:
   FindDistance: 9999
   ReturnDistance: 9999
   AttackDistance: 3
+  AttackDamage: 10
+  KnockBackPower: 30
   AttackCoolTime: 2
   DamageTime: 0.5
   DeathTime: 2

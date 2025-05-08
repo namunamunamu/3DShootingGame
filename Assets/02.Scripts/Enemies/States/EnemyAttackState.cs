@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using UnityEngine;
 
 public class EnemyAttackState : IEnemeyState
@@ -31,6 +32,14 @@ public class EnemyAttackState : IEnemeyState
         if(_attackTimer >= _enemy.EnemyData.AttackCoolTime)
         {
             Debug.Log("공격!");
+            Collider[] hitColliders = Physics.OverlapSphere(_enemy.transform.position, 2f);
+            foreach(Collider collider in hitColliders)
+            {
+                if(collider.gameObject.CompareTag("Player"))
+                {
+                    collider.gameObject.GetComponent<PlayerController>().TakeDamage(_enemy.Damage);
+                }
+            }
             _attackTimer = 0f;
         }
     }

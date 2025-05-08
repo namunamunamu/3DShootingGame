@@ -18,6 +18,7 @@ MonoBehaviour:
   _dashPower: 3
   _jumpPower: 5
   _maxMultiJump: 2
+  _maxHealth: 100
   _maxStamina: 100
   _staminaRecovery: 10
   _sprintStamina: 10

@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour
@@ -10,6 +11,8 @@ public class PlayerController : MonoBehaviour
 
     public float MoveSpeed;
 
+    public Action<Damage> OnAttacked;
+
     private void Awake()
     {
         PlayerData = GetComponent<PlayerStatus>();
@@ -19,9 +22,21 @@ public class PlayerController : MonoBehaviour
         CharacterController = GetComponent<CharacterController>();
     }
 
-    void Start()
+    private void Start()
     {
         PlayerData.InitializeStatData();
+    }
+
+    public void TakeDamage(Damage damage)
+    {
+        OnAttacked?.Invoke(damage);
+        PlayerData.SetHealth(-damage.Value);
+        
+
+        if(PlayerData.Health <= 0)
+        {
+            Destroy(gameObject);
+        }
     }
 
 }

@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 public class PlayerStatus : MonoBehaviour
@@ -10,7 +9,7 @@ public class PlayerStatus : MonoBehaviour
     public float JumpPower => _jumpPower;
     public int MaxMultiJump => _maxMultiJump;
 
-
+    public float Health => _health;
  
     public float Stamina => _stamina;
     public float MaxStamina => _maxStamina;
@@ -39,6 +38,12 @@ public class PlayerStatus : MonoBehaviour
     [SerializeField]
     private int _maxMultiJump;
 
+    [Header("체력 관련")]
+    [SerializeField]
+    private float _health;
+    [SerializeField]
+    private float _maxHealth;
+
     [Header("스테미나 관련")]
     [SerializeField]
     private float _stamina;
@@ -65,7 +70,7 @@ public class PlayerStatus : MonoBehaviour
         _dashPower = _statData._dashPower;
         _jumpPower = _statData._jumpPower;
         _maxMultiJump = _statData._maxMultiJump;
-
+        _maxHealth = _statData._maxHealth;
         _maxStamina = _statData._maxStamina;
         _staminaRecovery = _statData._staminaRecovery;
         _sprintStamina = _statData._sprintStamina;
@@ -74,7 +79,23 @@ public class PlayerStatus : MonoBehaviour
         _climbStamina = _statData._climbStamina;
         _jumpStamina = _statData._jumpStamina;
 
+        SetHealth(_maxHealth);
         SetStamina(MaxStamina);
+    }
+
+    public void SetHealth(float value)
+    {
+        _health += value;
+        if(_health <= 0)
+        {
+            _health = 0;
+        }
+
+        if(_health >= _maxHealth)
+        {
+            _health = _maxHealth;
+        }
+        UI_Manager.Instance.PlayerStatusPanel.OnChangeStatus?.Invoke();
     }
 
     public void SetStamina(float value)
@@ -90,6 +111,6 @@ public class PlayerStatus : MonoBehaviour
             _stamina = MaxStamina;
         }
 
-        UI_Manager.Instance.PlayerStatusPanel.OnChangeStamina(_stamina);
+        UI_Manager.Instance.PlayerStatusPanel.OnChangeStatus?.Invoke();
     }
 }

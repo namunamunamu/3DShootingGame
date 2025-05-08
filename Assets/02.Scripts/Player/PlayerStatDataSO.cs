@@ -9,7 +9,7 @@ public class PlayerStatDataSO : ScriptableObject
     public float _dashPower;
     public float _jumpPower;
     public int _maxMultiJump;
-
+    public float _maxHealth;
     public float _maxStamina;
     public float _staminaRecovery;
     public float _sprintStamina;

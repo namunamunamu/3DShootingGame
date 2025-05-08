@@ -22,6 +22,7 @@ public class CameraRotate : MonoBehaviour
 
     private ECameraMode _currentCameraMode;
     private Vector3 _recoil;
+    private GameObject _player;
 
 
 
@@ -31,7 +32,9 @@ public class CameraRotate : MonoBehaviour
         {
             Cursor.lockState = CursorLockMode.Locked;
         }
-        GameObject.FindWithTag("Player").GetComponent<PlayerFire>().OnFire += RotateByRecoil;
+        _player = GameObject.FindWithTag("Player");
+        _player.GetComponent<PlayerFire>().OnFire += RotateByRecoil;
+        _player.GetComponent<PlayerController>().OnAttacked += RotateByDamage;
     }
 
     private void Update()
@@ -73,5 +76,10 @@ public class CameraRotate : MonoBehaviour
     private void RotateByRecoil()
     {
         _recoil = WeaponManager.Instance.GetRecoil();
+    }
+
+    private void RotateByDamage(Damage damage)
+    {
+        _recoil = new Vector3(Random.Range(-1, 1)* damage.KnockBackPower, Random.Range(-1, 1) * damage.KnockBackPower, 0f);
     }
 }

@@ -18,6 +18,8 @@ public abstract class EnemyBase : MonoBehaviour
     public Vector3 InitialPosition => _initialPosition;
     public Vector3 ReturnPoint {get; set;}
 
+    public Damage Damage = new Damage();
+
     protected EnemyStateMachine _enemyFSM;
     protected GameObject _player;
     private NavMeshAgent _agent;
@@ -34,6 +36,10 @@ public abstract class EnemyBase : MonoBehaviour
         _agent.speed = EnemyData.MoveSpeed;
         _initialPosition = gameObject.transform.position;
         ReturnPoint = _initialPosition;
+
+        Damage.Value = EnemyData.AttackDamage;
+        Damage.From = this.gameObject;
+        Damage.KnockBackPower = EnemyData.KnockBackPower;
 
         _enemyHealth = EnemyData.Health;
 

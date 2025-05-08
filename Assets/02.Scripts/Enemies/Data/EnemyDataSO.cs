@@ -12,6 +12,9 @@ public class EnemyDataSO : ScriptableObject
     public float FindDistance;
     public float ReturnDistance;
     public float AttackDistance;
+
+    public int AttackDamage;
+    public float KnockBackPower;
     public float AttackCoolTime;
 
     public float DamageTime;

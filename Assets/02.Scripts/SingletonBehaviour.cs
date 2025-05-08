@@ -21,6 +21,7 @@ public class SingletonBehaviour<T> : MonoBehaviour where T: MonoBehaviour
                 if(_instance == null)
                 {
                     _instance = (T)FindFirstObjectByType(typeof(T));
+                    DontDestroyOnLoad(_instance.gameObject);
 
                     if(_instance == null)
                     {
