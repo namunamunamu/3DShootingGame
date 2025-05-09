@@ -40,6 +40,7 @@ public class EnemyStateMachine
             return;
         }
         _currentStateType = nextState;
+        _enemy.OnChangeState();
 
         _currentState.EndState();
         _currentState = newState;

@@ -8,6 +8,7 @@ public class PlayerController : MonoBehaviour
     public PlayerRotate PlayerRotate;
     public PlayerFire PlayerFire;
     public CharacterController CharacterController;
+    public Animator PlayerAnimator;
 
     public float MoveSpeed;
 
@@ -20,6 +21,7 @@ public class PlayerController : MonoBehaviour
         PlayerRotate = GetComponent<PlayerRotate>();
         PlayerFire = GetComponent<PlayerFire>();
         CharacterController = GetComponent<CharacterController>();
+        PlayerAnimator = GetComponent<Animator>();
     }
 
     private void Start()

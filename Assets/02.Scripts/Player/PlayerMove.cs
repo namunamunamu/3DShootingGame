@@ -32,6 +32,15 @@ public class PlayerMove : MonoBehaviour
         float v = Input.GetAxisRaw("Vertical");
 
         Vector3 dir = new Vector3(h, 0, v);
+        if(dir.sqrMagnitude != 0 )
+        {
+            _playerController.PlayerAnimator.SetBool("isMoving", true);
+        }
+        else
+        {
+            _playerController.PlayerAnimator.SetBool("isMoving", false);
+        }
+
         dir = dir.normalized;
         dir = Camera.main.transform.TransformDirection(dir);
 
@@ -90,6 +99,8 @@ public class PlayerMove : MonoBehaviour
             _yVelocity = _playerController.PlayerData.JumpPower;
             _playerController.PlayerData.SetStamina(-_playerController.PlayerData.JumpStamina);
         }
+
+
     }
 
 

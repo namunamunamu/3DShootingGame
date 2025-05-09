@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
@@ -20,18 +21,25 @@ public abstract class EnemyBase : MonoBehaviour
 
     public Damage Damage = new Damage();
 
+    private Animator _animator;
+
     protected EnemyStateMachine _enemyFSM;
     protected GameObject _player;
     private NavMeshAgent _agent;
     private Vector3 _initialPosition;
+    private Collider _collider;
 
     private int _enemyHealth;
 
     public float MINDISTANCE = 0.2f;
 
+    public Action OnChangeState;
 
     protected virtual void Awake()
     {
+        _animator = GetComponent<Animator>();
+        OnChangeState += SetAnimation;
+
         _agent = GetComponent<NavMeshAgent>();
         _agent.speed = EnemyData.MoveSpeed;
         _initialPosition = gameObject.transform.position;
@@ -45,6 +53,8 @@ public abstract class EnemyBase : MonoBehaviour
 
         SetStateDictionary();
         _enemyFSM = new EnemyStateMachine(this, EnemyStateDict);
+
+        _collider = GetComponent<Collider>();
     }
 
     protected virtual void Update()
@@ -57,6 +67,7 @@ public abstract class EnemyBase : MonoBehaviour
         _enemyHealth = EnemyData.Health;
         _enemyFSM.SetPlayer(player);
         _enemyFSM.SetState(EEnemyState.Idle);
+        _collider.enabled = true;
     }
 
     protected void SetStateDictionary()
@@ -87,6 +98,7 @@ public abstract class EnemyBase : MonoBehaviour
 
         if(_enemyHealth <= 0)
         {
+            _collider.enabled = false;
             _enemyFSM.SetState(EEnemyState.Die);
             Debug.Log($"상태전환: {_enemyFSM.CurrentStateType} -> Die");
             return;
@@ -94,5 +106,10 @@ public abstract class EnemyBase : MonoBehaviour
 
         Debug.Log($"상태 전환: {_enemyFSM.CurrentStateType} -> Damaged");
         _enemyFSM.SetState(EEnemyState.Damaged);
+    }
+
+    public void SetAnimation()
+    {
+        _animator.SetInteger("State", (int)_enemyFSM.CurrentStateType);
     }
 }
