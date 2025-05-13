@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class Bomb : MonoBehaviour
+public class Bomb : WeaponBase
 {
     // 목표: 마우스의 오른쪽 버튼을 누르면 카메라가 바라보는 방향으로 수류탄을 던지고 싶다.
     // 1. 수류탄 오브젝트 만들기
@@ -15,15 +15,10 @@ public class Bomb : MonoBehaviour
         effectObjet.gameObject.transform.position = transform.position;
         effectObjet.Play();
 
-        if(collision.gameObject.tag == "Enemy")
+        if(collision.gameObject.TryGetComponent<IDamageable>(out IDamageable damageable))
         {
             Damage damage = new Damage(){Value = BombDamage, KnockBackPower = BombKnockBack, From = gameObject};
-
-            Enemy enemy = collision.gameObject.GetComponent<Enemy>();
-            if(enemy != null)
-            {
-                enemy.TakeDamage(damage);
-            }
+            damageable.TakeDamage(damage);
         }
 
         gameObject.SetActive(false);       

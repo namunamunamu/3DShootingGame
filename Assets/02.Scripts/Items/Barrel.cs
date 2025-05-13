@@ -1,7 +1,7 @@
 using System.Collections;
 using UnityEngine;
 
-public class Barrel : MonoBehaviour
+public class Barrel : MonoBehaviour, IDamageable
 {
     [SerializeField]
     private int _health;
@@ -50,9 +50,9 @@ public class Barrel : MonoBehaviour
         Collider[] hitColliders = Physics.OverlapSphere(transform.position, _radius);
         foreach(Collider collider in hitColliders)
         {
-            if(collider.gameObject.CompareTag("Enemy"))
+            if(collider.TryGetComponent<IDamageable>(out IDamageable damageable))
             {
-                collider.gameObject.GetComponent<Enemy>().TakeDamage(damage);
+                damageable.TakeDamage(damage);
             }
         }
 

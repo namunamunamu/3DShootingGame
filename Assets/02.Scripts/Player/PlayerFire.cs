@@ -1,18 +1,16 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerFire : MonoBehaviour
 {
-    public GameObject FirePosition;
-
-    public TrailRenderer BulletTrail;
-    public float BulletSpeed;
-    public int BulletDamage = 10;
-    public float BulletKnockBack = 1000f;
+    public List<WeaponBase> Weapons;
 
     public float ThrowPower = 15f;
     public float MaxThrowPower = 5f;
+
+    private WeaponBase _currentWeapon;
 
     private bool _isReloading;
     private float _reloadTimer;
@@ -23,13 +21,41 @@ public class PlayerFire : MonoBehaviour
 
     public Action OnFire;
 
+    private void Start()
+    {
+        _currentWeapon = Weapons[0];
+    }
+
     private void Update()
     {
+        SwitchWeapon();
+
         ThrowGrenade();
 
         FireBullet();
 
         Reload();
+    }
+
+    private void SwitchWeapon()
+    {
+        if(Input.GetKeyDown(KeyCode.Alpha1))
+        {
+            // knife
+            _currentWeapon = Weapons[0];
+        }
+
+        if(Input.GetKeyDown(KeyCode.Alpha2))
+        {
+            // Gun
+            _currentWeapon = Weapons[1];
+        }
+
+        if(Input.GetKeyDown(KeyCode.Alpha3))
+        {
+            // Grenade
+            _currentWeapon = Weapons[2];
+        }
     }
 
     private void ThrowGrenade()
@@ -52,7 +78,7 @@ public class PlayerFire : MonoBehaviour
             }
 
             Bomb bomb = PoolManager.Instance.GetBomb();
-            bomb.transform.position = FirePosition.transform.position;
+            bomb.transform.position = _currentWeapon.FirePosition.position;
 
             Rigidbody bombRigidBody = bomb.GetComponent<Rigidbody>();
             bombRigidBody.AddForce(Camera.main.transform.forward * (ThrowPower + _throwTimer), ForceMode.Impulse);
@@ -64,20 +90,24 @@ public class PlayerFire : MonoBehaviour
         }
     }
 
+
     private void FireBullet()
     {
         _fireTimer += Time.deltaTime;
 
-        if(Input.GetMouseButton(0) && _fireTimer >= WeaponManager.Instance.FireTime)
+        if(Input.GetMouseButton(0) && _fireTimer >= _currentWeapon.FireTime)
         {
-            _isReloading = false;
-            _reloadTimer = 0f;
-            UI_Manager.Instance.WeaponPanel.OnReload(_isReloading);
-
-            if(WeaponManager.Instance.CurrentBullets <= 0)
+            if(_currentWeapon.CurrentBullets <= 0)
             {
                 Debug.Log("총알이 없습니다!");
                 return;
+            }
+
+            if(_isReloading)
+            {
+                _isReloading = false;
+                _reloadTimer = 0f;
+                UI_Manager.Instance.WeaponPanel.OnReload(_isReloading);
             }
 
             Ray ray = new Ray(Camera.main.transform.position, Camera.main.transform.forward);
@@ -86,38 +116,23 @@ public class PlayerFire : MonoBehaviour
             bool isHit = Physics.Raycast(ray, out hitInfo);
             if(isHit)
             {
-                if(hitInfo.collider.gameObject.CompareTag("Enemy"))
+                if(hitInfo.collider.TryGetComponent<IDamageable>(out IDamageable damageable))
                 {
-                    Debug.Log("Enemy Hit");
-                    EnemyBase enemy = hitInfo.collider.GetComponent<EnemyBase>();
-                    Damage damage = new Damage(){Value = BulletDamage, KnockBackPower = BulletKnockBack, From = gameObject };
-
-                    enemy.TakeDamage(damage);
+                    damageable.TakeDamage(_currentWeapon.Damage);
                 }
 
-                if(hitInfo.collider.gameObject.CompareTag("Barrel"))
-                {
-                    Debug.Log("Barrel Hit");
-                    Barrel barrel = hitInfo.collider.GetComponent<Barrel>();
-                    Damage damage = new Damage(){Value = BulletDamage, KnockBackPower = BulletKnockBack, From = gameObject };
-
-                    barrel.TakeDamage(damage);
-                }
-
-                TrailRenderer trail = Instantiate(BulletTrail, FirePosition.transform.position, Quaternion.identity);
+                TrailRenderer trail = Instantiate(_currentWeapon.BulletTrail, _currentWeapon.FirePosition.transform.position, Quaternion.identity);
                 StartCoroutine(SpawnTrail(trail, hitInfo.point));
 
                 ParticleSystem bulletEffect = PoolManager.Instance.GetVFX("BulletStormVFX");
                 bulletEffect.gameObject.transform.position = hitInfo.point;
                 bulletEffect.gameObject.transform.forward = hitInfo.normal;
                 bulletEffect.Play();
-
-                
             }
-
-            WeaponManager.Instance.AddBullet(-1);
-            OnFire();
+            _currentWeapon.AddBullet(-1);
             _fireTimer = 0;
+
+            OnFire();
         }
     }
 
@@ -127,6 +142,7 @@ public class PlayerFire : MonoBehaviour
         {
             Debug.Log("재장전!");
             _isReloading = true;
+
             UI_Manager.Instance.WeaponPanel.OnReload(_isReloading);
         }
 
@@ -134,15 +150,17 @@ public class PlayerFire : MonoBehaviour
         {
             _reloadTimer += Time.deltaTime;
 
-             UI_Manager.Instance.WeaponPanel.OnReloadTimerChange(_reloadTimer, WeaponManager.Instance.ReloadTime);
+            UI_Manager.Instance.WeaponPanel.OnReloadTimerChange(_reloadTimer, _currentWeapon.WeaponData.ReloadTime);
 
-            if(_reloadTimer >= WeaponManager.Instance.ReloadTime)
+            if(_reloadTimer >= _currentWeapon.WeaponData.ReloadTime)
             {
-                WeaponManager.Instance.ReloadMag();
+                _currentWeapon.Reload();
+
                 _isReloading = false;
                 _reloadTimer = 0;
-                 UI_Manager.Instance.WeaponPanel.OnReload(_isReloading);
                 Debug.Log("재장전 완료!");
+
+                UI_Manager.Instance.WeaponPanel.OnReload(_isReloading);
             }
         }
     }
@@ -157,7 +175,7 @@ public class PlayerFire : MonoBehaviour
         {
             trail.transform.position = Vector3.Lerp(startPosition, hitPoint, 1 - (remainingDistance / distance));
 
-            remainingDistance -= BulletSpeed * Time.deltaTime;
+            remainingDistance -= _currentWeapon.WeaponData.BulletSpeed * Time.deltaTime;
 
             yield return null;
         }

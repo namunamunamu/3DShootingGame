@@ -10,11 +10,11 @@ public class SingletonBehaviour<T> : MonoBehaviour where T: MonoBehaviour
     {
         get
         {
-            if(_shuttingDown)
-            {
-                Debug.LogWarning($"{typeof(T)} 는 이미 종료되었습니다.");
-                return null;
-            }
+            // if(_shuttingDown)
+            // {
+            //     Debug.LogWarning($"{typeof(T)} 는 이미 종료되었습니다.");
+            //     return null;
+            // }
 
             lock(_lock) // 스레드 안전
             {
@@ -38,8 +38,8 @@ public class SingletonBehaviour<T> : MonoBehaviour where T: MonoBehaviour
         }
     }
 
-    private void OnDestroy() 
-    {
-        _shuttingDown = true;
-    }
+    // private void OnDestroy() 
+    // {
+    //     _shuttingDown = true;
+    // }
 }

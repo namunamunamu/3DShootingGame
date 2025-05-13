@@ -10,7 +10,7 @@ public enum EEnemyType
     Count
 }
 
-public abstract class EnemyBase : MonoBehaviour
+public abstract class EnemyBase : MonoBehaviour, IDamageable
 {
     public EnemyDataSO EnemyData;
     public Dictionary<EEnemyState, IEnemeyState> EnemyStateDict;

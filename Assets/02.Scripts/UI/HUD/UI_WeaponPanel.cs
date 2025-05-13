@@ -22,14 +22,19 @@ public class UI_WeaponPanel : MonoBehaviour
 
     public Action<bool> OnReload;
     public Action<float, float> OnReloadTimerChange;
+    public Action<int, int> OnChangeBulletCount;
+
+    private void Awake()
+    {
+        OnChangeBulletCount += RefreshBulletText;
+        OnReload += SetReloadSliderActive;
+        OnReloadTimerChange += RefreshReloadSlider;
+    }
 
     private void Start()
     {
         WeaponManager.Instance.OnChangeMagCount += RefreshMagText;
         WeaponManager.Instance.OnChangeGrenadeCount += RefreshGrenadePanel;
-        WeaponManager.Instance.OnChangeBulletCount += RefreshBulletText;
-        OnReload += SetReloadSliderActive;
-        OnReloadTimerChange += RefreshReloadSlider;
         OnReload(false);
     }
 
