@@ -3859,8 +3859,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3732876329309938245}
-  - component: {fileID: 7813443593514533600}
-  - component: {fileID: 6545156354838854035}
   - component: {fileID: 8257037286510187610}
   - component: {fileID: 7293344912935130202}
   - component: {fileID: 3614317646075861540}
@@ -3895,59 +3893,6 @@ Transform:
   - {fileID: 7669680258584713412}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!33 &7813443593514533600
-MeshFilter:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5528667455928697787}
-  m_Mesh: {fileID: 10208, guid: 0000000000000000e000000000000000, type: 0}
---- !u!23 &6545156354838854035
-MeshRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5528667455928697787}
-  m_Enabled: 0
-  m_CastShadows: 1
-  m_ReceiveShadows: 1
-  m_DynamicOccludee: 1
-  m_StaticShadowCaster: 0
-  m_MotionVectors: 1
-  m_LightProbeUsage: 1
-  m_ReflectionProbeUsage: 1
-  m_RayTracingMode: 2
-  m_RayTraceProcedural: 0
-  m_RayTracingAccelStructBuildFlagsOverride: 0
-  m_RayTracingAccelStructBuildFlags: 1
-  m_SmallMeshCulling: 1
-  m_RenderingLayerMask: 1
-  m_RendererPriority: 0
-  m_Materials:
-  - {fileID: 2100000, guid: 614f700843f53f049af4ae62d868e044, type: 2}
-  m_StaticBatchInfo:
-    firstSubMesh: 0
-    subMeshCount: 0
-  m_StaticBatchRoot: {fileID: 0}
-  m_ProbeAnchor: {fileID: 0}
-  m_LightProbeVolumeOverride: {fileID: 0}
-  m_ScaleInLightmap: 1
-  m_ReceiveGI: 1
-  m_PreserveUVs: 0
-  m_IgnoreNormalsForChartDetection: 0
-  m_ImportantGI: 0
-  m_StitchLightmapSeams: 1
-  m_SelectedEditorRenderState: 3
-  m_MinimumChartSize: 4
-  m_AutoUVMaxDistance: 0.5
-  m_AutoUVMaxAngle: 89
-  m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
-  m_SortingOrder: 0
-  m_AdditionalVertexStreams: {fileID: 0}
 --- !u!114 &8257037286510187610
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4016,11 +3961,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cfaffbf09682dd64387bf82596fb4445, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  FirePosition: {fileID: 2682889538090076947}
-  BulletTrail: {fileID: 6176212653695484014, guid: 493bdc1deab375f469aa04ac88f2ce84, type: 3}
-  BulletSpeed: 150
-  BulletDamage: 40
-  BulletKnockBack: 0.5
+  FirePosition: {fileID: 2763871533125209301}
+  Weapons: []
   ThrowPower: 15
   MaxThrowPower: 5
 --- !u!114 &1131899474994294139
@@ -4060,13 +4002,13 @@ CharacterController:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Height: 2
-  m_Radius: 0.5
+  m_Height: 1.6
+  m_Radius: 0.3
   m_SlopeLimit: 45
   m_StepOffset: 0.3
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Center: {x: 0, y: -0.2, z: 0}
 --- !u!95 &1058131948922969725
 Animator:
   serializedVersion: 7
@@ -7791,9 +7733,9 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 67f716418f7ba2146a845739c7782755, type: 3}
---- !u!1 &2682889538090076947 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 1115510420516875044, guid: 67f716418f7ba2146a845739c7782755, type: 3}
+--- !u!4 &2763871533125209301 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 872468555090701538, guid: 67f716418f7ba2146a845739c7782755, type: 3}
   m_PrefabInstance: {fileID: 3044608184265154615}
   m_PrefabAsset: {fileID: 0}
 --- !u!4 &8995438256913023392 stripped
